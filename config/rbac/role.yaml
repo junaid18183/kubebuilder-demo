@@ -31,3 +31,29 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - enbuild.vivsoft.io
+  resources:
+  - microservices
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - enbuild.vivsoft.io
+  resources:
+  - microservices/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - enbuild.vivsoft.io
+  resources:
+  - microservices/status
+  verbs:
+  - get
+  - patch
+  - update
