@@ -63,6 +63,30 @@ spec:
               logs:
                 description: logs of the Application.
                 type: string
+              microservices:
+                items:
+                  description: MicroServiceSpec defines the desired state of MicroService
+                  properties:
+                    owner:
+                      description: Owner of the Service.
+                      type: string
+                    pipeline:
+                      description: Pipeline of the Service.
+                      type: string
+                    registry:
+                      description: Registry  of the Service.
+                      type: string
+                    repository:
+                      description: Github Repository of the Service.
+                      type: string
+                    type:
+                      description: Type of the Service.
+                      type: string
+                  required:
+                  - owner
+                  - type
+                  type: object
+                type: array
               owner:
                 description: Owner of the Application.
                 type: string
@@ -73,6 +97,7 @@ spec:
                 description: traces of the Application.
                 type: string
             required:
+            - microservices
             - owner
             type: object
           status:

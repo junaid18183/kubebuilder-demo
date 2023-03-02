@@ -10,3 +10,21 @@ metadata:
   name: hhs
 spec:
   owner: juned
+  repository: github.com
+  infrastrcture: eks
+  logs: logs
+  traces: traces
+  dashbord: some_dashboard
+  microservices:
+   - name: hhs-frontend
+     owner: juned
+     repository: github.com
+     registry: dockerhub
+     pipeline: actions
+     type: webapp
+   - name: hhs-backend
+     owner: juned
+     repository: github.com
+     registry: dockerhub
+     pipeline: actions
+     type: webapp

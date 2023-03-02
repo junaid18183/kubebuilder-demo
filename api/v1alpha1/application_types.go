@@ -40,7 +40,8 @@ type ApplicationSpec struct {
 	// traces of the Application.
 	Traces string `json:"traces,omitempty"`
 	// Dashboard of the Application.
-	Dashboard string `json:"dashboard,omitempty"`
+	Dashboard     string             `json:"dashboard,omitempty"`
+	MicroServices []MicroServiceSpec `json:"microservices"`
 }
 
 // ApplicationStatus defines the observed state of Application
