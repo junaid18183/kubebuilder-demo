@@ -34,6 +34,32 @@ rules:
 - apiGroups:
   - enbuild.vivsoft.io
   resources:
+  - catalogs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - enbuild.vivsoft.io
+  resources:
+  - catalogs/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - enbuild.vivsoft.io
+  resources:
+  - catalogs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - enbuild.vivsoft.io
+  resources:
   - microservices
   verbs:
   - create

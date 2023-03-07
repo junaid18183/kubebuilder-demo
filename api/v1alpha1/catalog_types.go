@@ -20,6 +20,29 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+type ComponentSpec struct {
+	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+	// Important: Run "make" to regenerate code after modifying this file
+
+	// +kubebuilder:validation:Required
+	// Role which can access the Catalog.
+	Name string `json:"name"`
+	// Github Repository of the Catalog.
+	Repository string `json:"repository,omitempty"`
+	// Gitlab ProjectID  of the Catalog.
+	ProjectId int16 `json:"project_id,omitempty"`
+	// readme_file_path of the Catalog.
+	ReadmeFilePath string `json:"readme_file_path,omitempty"`
+	// image_path of the Catalog.
+	ImagePath string `json:"image_path,omitempty"`
+	// variable_file_path of the Catalog.
+	VariableFilePath string `json:"variable_file_path,omitempty"`
+	// tool_type of the Component.
+	ToolType string `json:"tool_type,omitempty"`
+	// ref of the Catalog.
+	Ref string `json:"ref,omitempty"`
+}
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -28,8 +51,31 @@ type CatalogSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of Catalog. Edit catalog_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// +kubebuilder:validation:Required
+	// description which can access the Catalog.
+	Description string `json:"description,omitempty"`
+	// Role which can access the Catalog.
+	Role string `json:"role"`
+	// Type of the Catalog.
+	Type string `json:"type"`
+	// Github Repository of the Catalog.
+	Repository string `json:"repository,omitempty"`
+	// Gitlab ProjectID  of the Catalog.
+	ProjectId int16 `json:"project_id,omitempty"`
+	// values_folder_path of the Catalog.
+	ValuesFolderPath string `json:"values_folder_path,omitempty"`
+	// values_folder_path of the Catalog.
+	SecretsFolderPath string `json:"secrets_folder_path,omitempty"`
+	// image_path of the Catalog.
+	ImagePath string `json:"image_path,omitempty"`
+	// readme_file_path of the Catalog.
+	ReadmeFilePath string `json:"readme_file_path,omitempty"`
+	// ref of the Catalog.
+	Ref string `json:"ref,omitempty"`
+	// ref of the Catalog.
+	Sops bool `json:"sops,omitempty"`
+	// components of the Catalog
+	Components []ComponentSpec `json:"components",omitempty`
 }
 
 // CatalogStatus defines the observed state of Catalog
@@ -42,6 +88,12 @@ type CatalogStatus struct {
 //+kubebuilder:subresource:status
 
 // Catalog is the Schema for the catalogs API
+// +kubebuilder:validation:XPreserveUnknownFields
+// +kubebuilder:printcolumn:name=type,type=string,JSONPath=.spec.type
+// +kubebuilder:printcolumn:name=repository,type=string,JSONPath=.spec.repository
+// +kubebuilder:printcolumn:name=ref,type=string,JSONPath=.spec.ref
+// +kubebuilder:printcolumn:name=role,type=string,JSONPath=.spec.role
+// +kubebuilder:printcolumn:name=age,type=date,JSONPath=.metadata.creationTimestamp
 type Catalog struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
