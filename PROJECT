@@ -26,4 +26,13 @@ resources:
   kind: MicroService
   path: vivsoftorg/enbuild/api/v1alpha1
   version: v1alpha1
+- api:
+    crdVersion: v1
+    namespaced: true
+  controller: true
+  domain: vivsoft.io
+  group: enbuild
+  kind: Catalog
+  path: vivsoftorg/enbuild/api/v1alpha1
+  version: v1alpha1
 version: "3"

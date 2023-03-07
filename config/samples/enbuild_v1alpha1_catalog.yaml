@@ -1,0 +1,12 @@
+apiVersion: enbuild.vivsoft.io/v1alpha1
+kind: Catalog
+metadata:
+  labels:
+    app.kubernetes.io/name: catalog
+    app.kubernetes.io/instance: catalog-sample
+    app.kubernetes.io/part-of: enbuild-crd
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: enbuild-crd
+  name: catalog-sample
+spec:
+  # TODO(user): Add fields here
