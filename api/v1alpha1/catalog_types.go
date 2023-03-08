@@ -31,8 +31,6 @@ type ComponentSpec struct {
 	Repository string `json:"repository,omitempty"`
 	// Gitlab ProjectID  of the Catalog.
 	ProjectId int16 `json:"project_id,omitempty"`
-	// readme_file_path of the Catalog.
-	ReadmeFilePath string `json:"readme_file_path,omitempty"`
 	// image_path of the Catalog.
 	ImagePath string `json:"image_path,omitempty"`
 	// variable_file_path of the Catalog.
@@ -60,8 +58,6 @@ type CatalogSpec struct {
 	Type string `json:"type"`
 	// Github Repository of the Catalog.
 	Repository string `json:"repository,omitempty"`
-	// Gitlab ProjectID  of the Catalog.
-	ProjectId int16 `json:"project_id,omitempty"`
 	// values_folder_path of the Catalog.
 	ValuesFolderPath string `json:"values_folder_path,omitempty"`
 	// values_folder_path of the Catalog.

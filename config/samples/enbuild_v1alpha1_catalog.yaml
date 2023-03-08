@@ -9,12 +9,23 @@ spec:
   type: helm
   description: "Platform One BigBang"
   repository: "https://gitlab.com/enbuild-staging/iac-templates/bigbang"
-  project_id: 39029682
   readme_file_path: "README.md"
-  ref: main
   image_path: images/mlflow-logon.png
+  ref: main
   components: 
-    - name: mlflow
-      readme_file_path: "README.md"
-      variable_file_path: "kustomization.yaml"
-      image_path: "images/mlflow-logon.png"
+    - name: repo
+      tool_type: "Settings"
+      variable_file_path: "bigbang/envs/dev/values/repo.yaml"
+      image_path: "images/gear.png"
+    - name: istio
+      tool_type: "Service Mesh"
+      variable_file_path: "bigbang/envs/dev/values/istio.yaml"
+      image_path: "images/istio.png"
+    - name: istiooperator
+      tool_type: "Service Mesh"
+      variable_file_path: "bigbang/envs/dev/values/istiooperator.yaml"
+      image_path: "images/istio.png"
+    - name: jaeger
+      tool_type: "Service Mesh"
+      variable_file_path: "bigbang/envs/dev/values/jaeger.yaml"
+      image_path: "images/jaeger.png"
