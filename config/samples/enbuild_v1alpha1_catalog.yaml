@@ -8,10 +8,12 @@ spec:
   role: devops
   type: helm
   description: "Platform One BigBang"
-  repository: "https://gitlab.com/enbuild-staging/iac-templates/bigbang"
+  sourceRef:
+    kind: GitRepository
+    name: bigbang-catalog
+    namespace: default
   readme_file_path: "README.md"
   image_path: images/bigbang.png
-  ref: main
   components: 
     - name: repo
       tool_type: "Settings"

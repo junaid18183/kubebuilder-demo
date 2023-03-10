@@ -19,11 +19,11 @@ spec:
     - jsonPath: .spec.type
       name: type
       type: string
-    - jsonPath: .spec.repository
-      name: repository
+    - jsonPath: .spec.sourceRef.kind
+      name: source_type
       type: string
-    - jsonPath: .spec.ref
-      name: ref
+    - jsonPath: .spec.sourceRef.name
+      name: source_name
       type: string
     - jsonPath: .spec.role
       name: role
@@ -31,6 +31,12 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: age
       type: date
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].message
+      name: Status
+      type: string
     name: v1alpha1
     schema:
       openAPIV3Schema:
@@ -61,15 +67,33 @@ spec:
                     name:
                       description: Role which can access the Catalog.
                       type: string
-                    project_id:
-                      description: Gitlab ProjectID  of the Catalog.
-                      type: integer
-                    ref:
-                      description: ref of the Catalog.
-                      type: string
-                    repository:
-                      description: Github Repository of the Catalog.
-                      type: string
+                    sourceRef:
+                      description: The name and namespace of the gitrepositories.source.toolkit.fluxcd.io
+                        the Component is available at.
+                      properties:
+                        apiVersion:
+                          description: APIVersion of the referent.
+                          type: string
+                        kind:
+                          description: Kind of the referent.
+                          enum:
+                          - HelmRepository
+                          - GitRepository
+                          - Bucket
+                          type: string
+                        name:
+                          description: Name of the referent.
+                          maxLength: 253
+                          minLength: 1
+                          type: string
+                        namespace:
+                          description: Namespace of the referent.
+                          maxLength: 63
+                          minLength: 1
+                          type: string
+                      required:
+                      - name
+                      type: object
                     tool_type:
                       description: tool_type of the Component.
                       type: string
@@ -89,12 +113,6 @@ spec:
               readme_file_path:
                 description: readme_file_path of the Catalog.
                 type: string
-              ref:
-                description: ref of the Catalog.
-                type: string
-              repository:
-                description: Github Repository of the Catalog.
-                type: string
               role:
                 description: Role which can access the Catalog.
                 type: string
@@ -104,6 +122,33 @@ spec:
               sops:
                 description: ref of the Catalog.
                 type: boolean
+              sourceRef:
+                description: The name and namespace of the gitrepositories.source.toolkit.fluxcd.io
+                  the Component is available at.
+                properties:
+                  apiVersion:
+                    description: APIVersion of the referent.
+                    type: string
+                  kind:
+                    description: Kind of the referent.
+                    enum:
+                    - HelmRepository
+                    - GitRepository
+                    - Bucket
+                    type: string
+                  name:
+                    description: Name of the referent.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  namespace:
+                    description: Namespace of the referent.
+                    maxLength: 63
+                    minLength: 1
+                    type: string
+                required:
+                - name
+                type: object
               type:
                 description: Type of the Catalog.
                 type: string
@@ -113,10 +158,86 @@ spec:
             required:
             - components
             - role
+            - sourceRef
             - type
             type: object
           status:
             description: CatalogStatus defines the observed state of Catalog
+            properties:
+              conditions:
+                description: Conditions holds the conditions for the HelmRelease.
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource. --- This struct is intended for direct
+                    use as an array at the field path .status.conditions.  For example,
+                    \n type FooStatus struct{ // Represents the observations of a
+                    foo's current state. // Known .status.conditions.type are: \"Available\",
+                    \"Progressing\", and \"Degraded\" // +patchMergeKey=type // +patchStrategy=merge
+                    // +listType=map // +listMapKey=type Conditions []metav1.Condition
+                    `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\"
+                    protobuf:\"bytes,1,rep,name=conditions\"` \n // other fields }"
+                  properties:
+                    lastTransitionTime:
+                      description: lastTransitionTime is the last time the condition
+                        transitioned from one status to another. This should be when
+                        the underlying condition changed.  If that is not known, then
+                        using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: message is a human readable message indicating
+                        details about the transition. This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: observedGeneration represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.conditions[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: reason contains a programmatic identifier indicating
+                        the reason for the condition's last transition. Producers
+                        of specific condition types may define expected values and
+                        meanings for this field, and whether the values are considered
+                        a guaranteed API. The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: type of condition in CamelCase or in foo.example.com/CamelCase.
+                        --- Many .condition.type values are consistent across resources
+                        like Available, but because arbitrary conditions can be useful
+                        (see .node.status.conditions), the ability to deconflict is
+                        important. The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              failures:
+                description: Failures is the reconciliation failure count against
+                  the latest desired state. It is reset after a successful reconciliation.
+                format: int64
+                type: integer
             type: object
         type: object
         x-kubernetes-preserve-unknown-fields: true
