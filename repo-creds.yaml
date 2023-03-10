@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repository-credentials
+  namespace: default
+data:
+  password: YVNYQUdmeXpMWGlNM0FGaFlzSFQ=
+  username: Z2l0bGFiK2RlcGxveS10b2tlbi01MjA4OTM=
+type: Opaque
+
