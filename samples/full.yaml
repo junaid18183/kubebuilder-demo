@@ -1,0 +1,58 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: webapp_react
+spec:
+  interval: 1m0s
+  url: https://github.com/VivSoftOrg/iac-templates-app-ci
+  ref:
+    branch: main
+  secretRef:
+    name: repository-credentials
+---
+apiVersion: enbuild.vivsoft.io/v1alpha1
+kind: Application
+metadata:
+  name: hhs
+spec:
+  owner: juned
+  infrastrcture: eks_for_hhs
+  logs: logs_url
+  traces: traces_url
+  dashbord: dashboard_url
+  microservices:
+   - name: hhs-frontend
+     template: webapp_react
+---
+apiVersion: enbuild.vivsoft.io/v1alpha1
+kind: MicroService
+metadata:
+  name: hhs-frontend
+spec:
+  owner: juned
+  template_repo: webapp_react
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository # Created by the MicroService Controller for the `hhs-frontend` MicroService
+metadata:
+  name: hhs-frontend
+spec:
+  interval: 1m0s
+  url: https://github.com/VivSoftOrg/hhs-frontend
+  ref:
+    branch: main
+  secretRef:
+    name: repository-credentials
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository # Created by the Application Controller for the `hhs` Application
+metadata:
+  name: app-hhs
+spec:
+  interval: 1m0s
+  url: https://github.com/VivSoftOrg/app-hhs
+  ref:
+    branch: main
+  secretRef:
+    name: repository-credentials
+---
