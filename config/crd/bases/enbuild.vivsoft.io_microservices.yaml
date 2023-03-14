@@ -22,16 +22,13 @@ spec:
     - jsonPath: .spec.owner
       name: owner
       type: string
-    - jsonPath: .spec.type
-      name: type
-      type: string
-    - jsonPath: .spec.repository
+    - jsonPath: .status.repository
       name: repository
       type: string
-    - jsonPath: .spec.registry
+    - jsonPath: .status.registry
       name: registry
       type: string
-    - jsonPath: .spec.pipeline
+    - jsonPath: .status.pipeline
       name: pipeline
       type: string
     name: v1alpha1
@@ -55,8 +52,17 @@ spec:
             description: MicroServiceSpec defines the desired state of MicroService
             properties:
               owner:
-                description: Owner of the Service.
+                description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
+                  Important: Run "make" to regenerate code after modifying this file'
                 type: string
+              template:
+                type: string
+            required:
+            - template
+            type: object
+          status:
+            description: MicroServiceStatus defines the observed state of MicroService
+            properties:
               pipeline:
                 description: Pipeline of the Service.
                 type: string
@@ -64,17 +70,10 @@ spec:
                 description: Registry  of the Service.
                 type: string
               repository:
-                description: Github Repository of the Service.
+                description: 'INSERT ADDITIONAL STATUS FIELD - define observed state
+                  of cluster Important: Run "make" to regenerate code after modifying
+                  this file Github Repository of the Service.'
                 type: string
-              type:
-                description: Type of the Service.
-                type: string
-            required:
-            - owner
-            - type
-            type: object
-          status:
-            description: MicroServiceStatus defines the observed state of MicroService
             type: object
         type: object
         x-kubernetes-preserve-unknown-fields: true

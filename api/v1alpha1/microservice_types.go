@@ -27,24 +27,20 @@ import (
 type MicroServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-
-	// +kubebuilder:validation:Required
-	// Owner of the Service.
-	Owner string `json:"owner"`
-	// Type of the Service.
-	Type string `json:"type"`
-	// Github Repository of the Service.
-	Repository string `json:"repository,omitempty"`
-	// Registry  of the Service.
-	Registry string `json:"registry,omitempty"`
-	// Pipeline of the Service.
-	Pipeline string `json:"pipeline,omitempty"`
+	Owner    string `json:"owner,omitempty"`
+	Template string `json:"template"`
 }
 
 // MicroServiceStatus defines the observed state of MicroService
 type MicroServiceStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	// Github Repository of the Service.
+	Repository string `json:"repository,omitempty"`
+	// Registry  of the Service.
+	Registry string `json:"registry,omitempty"`
+	// Pipeline of the Service.
+	Pipeline string `json:"pipeline,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -54,10 +50,9 @@ type MicroServiceStatus struct {
 // +kubebuilder:validation:XPreserveUnknownFields
 // +kubebuilder:printcolumn:name=age,type=date,JSONPath=.metadata.creationTimestamp
 // +kubebuilder:printcolumn:name=owner,type=string,JSONPath=.spec.owner
-// +kubebuilder:printcolumn:name=type,type=string,JSONPath=.spec.type
-// +kubebuilder:printcolumn:name=repository,type=string,JSONPath=.spec.repository
-// +kubebuilder:printcolumn:name=registry,type=string,JSONPath=.spec.registry
-// +kubebuilder:printcolumn:name=pipeline,type=string,JSONPath=.spec.pipeline
+// +kubebuilder:printcolumn:name=repository,type=string,JSONPath=.status.repository
+// +kubebuilder:printcolumn:name=registry,type=string,JSONPath=.status.registry
+// +kubebuilder:printcolumn:name=pipeline,type=string,JSONPath=.status.pipeline
 type MicroService struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

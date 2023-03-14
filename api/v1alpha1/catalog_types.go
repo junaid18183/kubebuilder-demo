@@ -117,7 +117,7 @@ type CatalogStatus struct {
 // +kubebuilder:printcolumn:name=source_name,type=string,JSONPath=.spec.sourceRef.name
 // +kubebuilder:printcolumn:name=role,type=string,JSONPath=.spec.role
 // +kubebuilder:printcolumn:name=age,type=date,JSONPath=.metadata.creationTimestamp
-// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.c[?(@.type==\"Ready\")].status",description=""
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].status",description=""
 // +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].message",description=""
 type Catalog struct {
 	metav1.TypeMeta   `json:",inline"`

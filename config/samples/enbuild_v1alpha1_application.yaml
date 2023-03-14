@@ -1,30 +1,13 @@
 apiVersion: enbuild.vivsoft.io/v1alpha1
 kind: Application
 metadata:
-  labels:
-    app.kubernetes.io/name: application
-    app.kubernetes.io/instance: application-sample
-    app.kubernetes.io/part-of: enbuild-crd
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/created-by: enbuild-crd
   name: hhs
 spec:
   owner: juned
-  repository: github.com
-  infrastrcture: eks
-  logs: logs
-  traces: traces
-  dashbord: some_dashboard
+  infrastrcture: eks_for_hhs
+  logs: logs_url
+  traces: traces_url
+  dashbord: dashboard_url
   microservices:
    - name: hhs-frontend
-     owner: juned
-     repository: github.com
-     registry: dockerhub
-     pipeline: actions
-     type: webapp
-   - name: hhs-backend
-     owner: juned
-     repository: github.com
-     registry: dockerhub
-     pipeline: actions
-     type: webapp
+     template: webapp_react

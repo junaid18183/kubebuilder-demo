@@ -68,30 +68,17 @@ spec:
                   description: MicroServiceSpec defines the desired state of MicroService
                   properties:
                     owner:
-                      description: Owner of the Service.
+                      description: 'INSERT ADDITIONAL SPEC FIELDS - desired state
+                        of cluster Important: Run "make" to regenerate code after
+                        modifying this file'
                       type: string
-                    pipeline:
-                      description: Pipeline of the Service.
-                      type: string
-                    registry:
-                      description: Registry  of the Service.
-                      type: string
-                    repository:
-                      description: Github Repository of the Service.
-                      type: string
-                    type:
-                      description: Type of the Service.
+                    template:
                       type: string
                   required:
-                  - owner
-                  - type
+                  - template
                   type: object
                 type: array
               owner:
-                description: Owner of the Application.
-                type: string
-              repository:
-                description: Github Repository of the Application.
                 type: string
               traces:
                 description: traces of the Application.

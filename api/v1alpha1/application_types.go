@@ -30,9 +30,8 @@ type ApplicationSpec struct {
 
 	// Owner of the Application.
 	// +kubebuilder:validation:Required
+
 	Owner string `json:"owner"`
-	// Github Repository of the Application.
-	Repository string `json:"repository,omitempty"`
 	// Infrastrcture  of the Application.
 	Infrastrcture string `json:"infrastrcture,omitempty"`
 	// logs of the Application.
