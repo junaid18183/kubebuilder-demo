@@ -47,6 +47,14 @@ type ApplicationSpec struct {
 type ApplicationStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	// Conditions holds the conditions for the HelmRelease.
+	// +optional
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// Failures is the reconciliation failure count against the latest desired
+	// state. It is reset after a successful reconciliation.
+	// +optional
+	Failures int64 `json:"failures,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -60,6 +68,8 @@ type ApplicationStatus struct {
 // +kubebuilder:printcolumn:name=logs,type=string,JSONPath=.spec.infrastrcture
 // +kubebuilder:printcolumn:name=traces,type=string,JSONPath=.spec.traces
 // +kubebuilder:printcolumn:name=age,type=date,JSONPath=.metadata.creationTimestamp
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].status",description=""
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].message",description=""
 type Application struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

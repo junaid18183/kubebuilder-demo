@@ -41,6 +41,14 @@ type MicroServiceStatus struct {
 	Registry string `json:"registry,omitempty"`
 	// Pipeline of the Service.
 	Pipeline string `json:"pipeline,omitempty"`
+	// Conditions holds the conditions for the HelmRelease.
+	// +optional
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// Failures is the reconciliation failure count against the latest desired
+	// state. It is reset after a successful reconciliation.
+	// +optional
+	Failures int64 `json:"failures,omitempty"`
 }
 
 //+kubebuilder:object:root=true
@@ -53,6 +61,8 @@ type MicroServiceStatus struct {
 // +kubebuilder:printcolumn:name=repository,type=string,JSONPath=.status.repository
 // +kubebuilder:printcolumn:name=registry,type=string,JSONPath=.status.registry
 // +kubebuilder:printcolumn:name=pipeline,type=string,JSONPath=.status.pipeline
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].status",description=""
+// +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].message",description=""
 type MicroService struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
