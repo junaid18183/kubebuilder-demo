@@ -88,7 +88,7 @@ func (r *MicroServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, "https://gitlab.com/enbuild-staging/iac-templates/bigbang", microservice.Spec.SecretRef.Name, "main")
+	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, "https://gitlab.com/enbuild-staging/microservice_"+microservice.Name, microservice.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err

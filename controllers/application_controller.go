@@ -44,6 +44,7 @@ type ApplicationReconciler struct {
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications/finalizers,verbs=update
 
+//+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=microservices,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=source.toolkit.fluxcd.io,resources=GitRepository,verbs=list;watch;get;patch;create;update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
@@ -71,9 +72,11 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	// logger.Info("got application", "Owner", application.Spec.Owner)
 
-	// Reconcile k8s gitrepository.
+	// Reconcile k8s gitrepository for application which holds the infra code
 	ReconcileGitRepositoryApplication(ctx, r, application, logger)
 
+	// Reconcile microservices for application
+	ReconcileMicroServiceApplication(ctx, r, application, logger)
 	return ctrl.Result{}, nil
 }
 
@@ -84,13 +87,14 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&enbuildv1alpha1.Application{}).
 		WithEventFilter(predicate.Or(predicate.GenerationChangedPredicate{}, predicate.LabelChangedPredicate{}, predicate.AnnotationChangedPredicate{})).
 		Owns(&sourcev1.GitRepository{}).
+		Owns(&enbuildv1alpha1.MicroService{}).
 		Complete(r)
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, "https://gitlab.com/enbuild-staging/iac-templates/bigbang", application.Spec.SecretRef.Name, "main")
+	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, "https://gitlab.com/enbuild-staging/application_"+application.Name, application.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err
@@ -112,3 +116,25 @@ func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconc
 	}
 	return ctrl.Result{}, _err
 }
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+func ReconcileMicroServiceApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
+	microservice, err := generateMicroServiceSpec(application.Spec.MicroServices[0].Template, application.Namespace, application.Spec.MicroServices[0].Template, application.Spec.SecretRef.Name, application.Spec.Owner)
+
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if err := ctrl.SetControllerReference(application, microservice, r.Scheme); err != nil {
+
+		return ctrl.Result{}, err
+	}
+	if err := CreateMicroService(ctx, r.Client, microservice, logger); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	return ctrl.Result{}, nil
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------

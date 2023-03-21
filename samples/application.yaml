@@ -10,6 +10,6 @@ spec:
   dashbord: dashboard_url
   microservices:
    - name: hhs-frontend
-     template: webapp_react
+     template: webapp-react
   secretRef:
     name: repository-credentials

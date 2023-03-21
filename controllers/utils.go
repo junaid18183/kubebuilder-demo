@@ -19,6 +19,8 @@ package controllers
 import (
 	"context"
 
+	enbuildv1alpha1 "vivsoftorg/enbuild/api/v1alpha1"
+
 	"github.com/fluxcd/pkg/apis/meta"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
 	"github.com/go-logr/logr"
@@ -56,6 +58,42 @@ func CreateGitRepository(ctx context.Context, r client.Client, gitrepository *so
 			}
 		} else {
 			log.Error(err, "error getting gitrepository")
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+func generateMicroServiceSpec(name string, namespace string, template string, secret_ref string, owner string) (*enbuildv1alpha1.MicroService, error) {
+
+	return &enbuildv1alpha1.MicroService{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: enbuildv1alpha1.MicroServiceSpec{
+			Owner:     owner,
+			Template:  template,
+			SecretRef: &meta.LocalObjectReference{Name: secret_ref},
+		},
+	}, nil
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+func CreateMicroService(ctx context.Context, r client.Client, microservice *enbuildv1alpha1.MicroService, log logr.Logger) error {
+	foundMicroService := &enbuildv1alpha1.MicroService{}
+	if err := r.Get(ctx, types.NamespacedName{Name: microservice.Name, Namespace: microservice.Namespace}, foundMicroService); err != nil {
+		if apierrs.IsNotFound(err) {
+			log.Info("Creating MicroService", "namespace", microservice.Namespace, "name", microservice.Name)
+			if err := r.Create(ctx, microservice); err != nil {
+				log.Error(err, "unable to create microservice")
+				return err
+			}
+		} else {
+			log.Error(err, "error getting microservice")
 			return err
 		}
 	}
