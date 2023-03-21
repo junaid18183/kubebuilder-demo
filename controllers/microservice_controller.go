@@ -21,9 +21,7 @@ import (
 
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
 	"github.com/go-logr/logr"
-	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -87,25 +85,6 @@ func (r *MicroServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-func CreateGitRepository1(ctx context.Context, r *MicroServiceReconciler, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
-	foundGitRepository := &sourcev1.GitRepository{}
-	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
-		if apierrs.IsNotFound(err) {
-			log.Info("Creating GitRepository", "namespace", gitrepository.Namespace, "name", gitrepository.Name)
-			if err := r.Create(ctx, gitrepository); err != nil {
-				log.Error(err, "unable to create gitrepository")
-				return err
-			}
-		} else {
-			log.Error(err, "error getting gitrepository")
-			return err
-		}
-	}
-
-	return nil
-}
-
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func ReconcileGitRepository1(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
@@ -119,7 +98,7 @@ func ReconcileGitRepository1(ctx context.Context, r *MicroServiceReconciler, mic
 
 		return ctrl.Result{}, err
 	}
-	if err := CreateGitRepository1(ctx, r, gitrepository, logger); err != nil {
+	if err := CreateGitRepository(ctx, r.Client, gitrepository, logger); err != nil {
 		return ctrl.Result{}, err
 	}
 

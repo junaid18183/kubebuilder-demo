@@ -20,9 +20,7 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -90,25 +88,6 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-func CreateGitRepository(ctx context.Context, r *ApplicationReconciler, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
-	foundGitRepository := &sourcev1.GitRepository{}
-	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
-		if apierrs.IsNotFound(err) {
-			log.Info("Creating GitRepository", "namespace", gitrepository.Namespace, "name", gitrepository.Name)
-			if err := r.Create(ctx, gitrepository); err != nil {
-				log.Error(err, "unable to create gitrepository")
-				return err
-			}
-		} else {
-			log.Error(err, "error getting gitrepository")
-			return err
-		}
-	}
-
-	return nil
-}
-
-//---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func ReconcileGitRepository(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
 	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, "https://gitlab.com/enbuild-staging/iac-templates/bigbang", application.Spec.SecretRef.Name, "main")
@@ -121,7 +100,7 @@ func ReconcileGitRepository(ctx context.Context, r *ApplicationReconciler, appli
 
 		return ctrl.Result{}, err
 	}
-	if err := CreateGitRepository(ctx, r, gitrepository, logger); err != nil {
+	if err := CreateGitRepository(ctx, r.Client, gitrepository, logger); err != nil {
 		return ctrl.Result{}, err
 	}
 

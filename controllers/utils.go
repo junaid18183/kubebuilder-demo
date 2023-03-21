@@ -17,9 +17,15 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
+
 	"github.com/fluxcd/pkg/apis/meta"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
+	"github.com/go-logr/logr"
+	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -36,6 +42,25 @@ func generateGitRepositorySpec(name string, namespace string, url string, secret
 			Reference: &sourcev1.GitRepositoryRef{Branch: branch},
 		},
 	}, nil
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+func CreateGitRepository(ctx context.Context, r client.Client, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
+	foundGitRepository := &sourcev1.GitRepository{}
+	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
+		if apierrs.IsNotFound(err) {
+			log.Info("Creating GitRepository", "namespace", gitrepository.Namespace, "name", gitrepository.Name)
+			if err := r.Create(ctx, gitrepository); err != nil {
+				log.Error(err, "unable to create gitrepository")
+				return err
+			}
+		} else {
+			log.Error(err, "error getting gitrepository")
+			return err
+		}
+	}
+
+	return nil
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
