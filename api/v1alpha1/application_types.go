@@ -58,6 +58,7 @@ type ApplicationStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 	// Conditions holds the conditions for the HelmRelease.
 	// +optional
+	Repository string             `json:"repository,omitempty"`
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Failures is the reconciliation failure count against the latest desired
@@ -72,7 +73,7 @@ type ApplicationStatus struct {
 // Application is the Schema for the applications API
 // +kubebuilder:validation:XPreserveUnknownFields
 // +kubebuilder:printcolumn:name=owner,type=string,JSONPath=.spec.owner
-// +kubebuilder:printcolumn:name=repository,type=string,JSONPath=.spec.repository
+// +kubebuilder:printcolumn:name=repository,type=string,JSONPath=.status.repository
 // +kubebuilder:printcolumn:name=infrastrcture,type=string,JSONPath=.spec.infrastrcture
 // +kubebuilder:printcolumn:name=logs,type=string,JSONPath=.spec.infrastrcture
 // +kubebuilder:printcolumn:name=traces,type=string,JSONPath=.spec.traces

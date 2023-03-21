@@ -27,12 +27,14 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
 
 	enbuildv1alpha1 "vivsoftorg/enbuild/api/v1alpha1"
 
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
 )
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // ApplicationReconciler reconciles a Application object
 type ApplicationReconciler struct {
 	client.Client
@@ -40,6 +42,7 @@ type ApplicationReconciler struct {
 	Log    logr.Logger
 }
 
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications/finalizers,verbs=update
@@ -85,17 +88,28 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, err
 	}
 
+	application.Status.Repository = gitrepository.Spec.URL
+	application.Status.Failures = 0
+
+	_err := r.Status().Update(ctx, application)
+	if _err != nil {
+		return ctrl.Result{}, _err
+	}
+
 	return ctrl.Result{}, nil
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 // SetupWithManager sets up the controller with the Manager.
 func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&enbuildv1alpha1.Application{}).
+		WithEventFilter(predicate.Or(predicate.GenerationChangedPredicate{}, predicate.LabelChangedPredicate{}, predicate.AnnotationChangedPredicate{})).
 		Owns(&sourcev1.GitRepository{}).
 		Complete(r)
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 func generateGitRepositorySpec(app *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*sourcev1.GitRepository, error) {
 
 	return &sourcev1.GitRepository{
@@ -111,6 +125,7 @@ func generateGitRepositorySpec(app *enbuildv1alpha1.Application, log logr.Logger
 	}, nil
 }
 
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 func CreateGitRepository(ctx context.Context, r *ApplicationReconciler, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
 	foundGitRepository := &sourcev1.GitRepository{}
 	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
@@ -128,3 +143,5 @@ func CreateGitRepository(ctx context.Context, r *ApplicationReconciler, gitrepos
 
 	return nil
 }
+
+//---------------------------------------------------------------------------------------------------------------------------------------------------------------

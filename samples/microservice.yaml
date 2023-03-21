@@ -1,0 +1,7 @@
+apiVersion: enbuild.vivsoft.io/v1alpha1
+kind: MicroService
+metadata:
+  name: hhs-frontend
+spec:
+  owner: juned
+  template: webapp_react
