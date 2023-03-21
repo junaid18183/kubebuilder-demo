@@ -33,6 +33,8 @@ import (
 
 	enbuildv1alpha1 "vivsoftorg/enbuild/api/v1alpha1"
 	"vivsoftorg/enbuild/controllers"
+
+	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
 	//+kubebuilder:scaffold:imports
 )
 
@@ -45,6 +47,8 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(enbuildv1alpha1.AddToScheme(scheme))
+
+	utilruntime.Must(sourcev1.AddToScheme(scheme))
 	//+kubebuilder:scaffold:scheme
 }
 
