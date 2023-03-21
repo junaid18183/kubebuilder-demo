@@ -156,7 +156,6 @@ spec:
                 description: values_folder_path of the Catalog.
                 type: string
             required:
-            - components
             - role
             - sourceRef
             - type

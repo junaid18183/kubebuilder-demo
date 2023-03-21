@@ -92,7 +92,7 @@ type CatalogSpec struct {
 	// ref of the Catalog.
 	Sops bool `json:"sops,omitempty"`
 	// components of the Catalog
-	Components []ComponentSpec `json:"components",omitempty`
+	Components []ComponentSpec `json:"components,omitempty"`
 }
 
 // CatalogStatus defines the observed state of Catalog

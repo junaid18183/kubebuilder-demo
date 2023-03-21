@@ -1,0 +1,13 @@
+apiVersion: enbuild.vivsoft.io/v1alpha1
+kind: Application
+metadata:
+  name: hhs
+spec:
+  owner: juned
+  infrastrcture: eks_for_hhs
+  logs: logs_url
+  traces: traces_url
+  dashbord: dashboard_url
+  microservices:
+   - name: hhs-frontend
+     template: webapp_react
