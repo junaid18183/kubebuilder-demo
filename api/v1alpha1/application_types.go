@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxcd/pkg/apis/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -41,6 +42,14 @@ type ApplicationSpec struct {
 	// Dashboard of the Application.
 	Dashboard     string             `json:"dashboard,omitempty"`
 	MicroServices []MicroServiceSpec `json:"microservices"`
+	// SecretRef specifies the Secret containing authentication credentials for
+	// the GitRepository.
+	// For HTTPS repositories the Secret must contain 'username' and 'password'
+	// fields for basic auth or 'bearerToken' field for token auth.
+	// For SSH repositories the Secret must contain 'identity'
+	// and 'known_hosts' fields.
+	// +optional
+	SecretRef *meta.LocalObjectReference `json:"secretRef,omitempty"`
 }
 
 // ApplicationStatus defines the observed state of Application

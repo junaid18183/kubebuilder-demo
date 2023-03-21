@@ -11,3 +11,5 @@ spec:
   microservices:
    - name: hhs-frontend
      template: webapp_react
+  secretRef:
+    name: repository-credentials

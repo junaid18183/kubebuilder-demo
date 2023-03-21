@@ -96,14 +96,17 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func generateGitRepositorySpec(tb *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*sourcev1.GitRepository, error) {
+func generateGitRepositorySpec(app *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*sourcev1.GitRepository, error) {
+
 	return &sourcev1.GitRepository{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      tb.Name,
-			Namespace: tb.Namespace,
+			Name:      app.Name,
+			Namespace: app.Namespace,
 		},
 		Spec: sourcev1.GitRepositorySpec{
-			URL: "https://gitlab.com/enbuild-staging/iac-templates/bigbang",
+			URL:       "https://gitlab.com/enbuild-staging/iac-templates/bigbang",
+			SecretRef: app.Spec.SecretRef,
+			Reference: &sourcev1.GitRepositoryRef{Branch: "main"},
 		},
 	}, nil
 }

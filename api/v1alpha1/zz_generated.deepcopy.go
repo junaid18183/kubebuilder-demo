@@ -22,6 +22,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxcd/pkg/apis/meta"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
@@ -92,6 +93,11 @@ func (in *ApplicationSpec) DeepCopyInto(out *ApplicationSpec) {
 		in, out := &in.MicroServices, &out.MicroServices
 		*out = make([]MicroServiceSpec, len(*in))
 		copy(*out, *in)
+	}
+	if in.SecretRef != nil {
+		in, out := &in.SecretRef, &out.SecretRef
+		*out = new(meta.LocalObjectReference)
+		**out = **in
 	}
 }
 
