@@ -75,26 +75,7 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// logger.Info("got application", "Owner", application.Spec.Owner)
 
 	// Reconcile k8s gitrepository.
-	gitrepository, err := generateGitRepositorySpec(application, logger, r)
-	if err != nil {
-		return ctrl.Result{}, err
-	}
-
-	if err := ctrl.SetControllerReference(application, gitrepository, r.Scheme); err != nil {
-
-		return ctrl.Result{}, err
-	}
-	if err := CreateGitRepository(ctx, r, gitrepository, logger); err != nil {
-		return ctrl.Result{}, err
-	}
-
-	application.Status.Repository = gitrepository.Spec.URL
-	application.Status.Failures = 0
-
-	_err := r.Status().Update(ctx, application)
-	if _err != nil {
-		return ctrl.Result{}, _err
-	}
+	ReconcileGitRepository(ctx, r, application, logger)
 
 	return ctrl.Result{}, nil
 }
@@ -145,3 +126,27 @@ func CreateGitRepository(ctx context.Context, r *ApplicationReconciler, gitrepos
 }
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+func ReconcileGitRepository(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
+	gitrepository, err := generateGitRepositorySpec(application, logger, r)
+
+	if err != nil {
+		return ctrl.Result{}, err
+	}
+
+	if err := ctrl.SetControllerReference(application, gitrepository, r.Scheme); err != nil {
+
+		return ctrl.Result{}, err
+	}
+	if err := CreateGitRepository(ctx, r, gitrepository, logger); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	application.Status.Repository = gitrepository.Spec.URL
+
+	_err := r.Status().Update(ctx, application)
+	if _err != nil {
+		return ctrl.Result{}, _err
+	}
+	return ctrl.Result{}, _err
+}
