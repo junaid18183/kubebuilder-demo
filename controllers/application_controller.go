@@ -20,8 +20,10 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -56,6 +58,7 @@ type ApplicationReconciler struct {
 func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 
 	logger := log.FromContext(ctx)
+	// TODO(user): your logic here
 
 	application := &enbuildv1alpha1.Application{}
 	if err := r.Get(ctx, req.NamespacedName, application); err != nil {
@@ -66,30 +69,21 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
-	logger.Info("got application", "Owner", application.Spec.Owner)
+	// logger.Info("got application", "Owner", application.Spec.Owner)
 
 	// Reconcile k8s gitrepository.
 	gitrepository, err := generateGitRepositorySpec(application, logger, r)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	logger.Info(gitrepository.Spec.URL)
+
 	if err := ctrl.SetControllerReference(application, gitrepository, r.Scheme); err != nil {
 
 		return ctrl.Result{}, err
 	}
-	// if err := CreateGitRepository(ctx, r, application, logger); err != nil {
-	// 	return ctrl.Result{}, err
-	// }
-
-	applyOpts := []client.CreateOption{}
-
-	err = r.Create(ctx, gitrepository, applyOpts...)
-	if err != nil {
+	if err := CreateGitRepository(ctx, r, gitrepository, logger); err != nil {
 		return ctrl.Result{}, err
 	}
-
-	// TODO(user): your logic here
 
 	return ctrl.Result{}, nil
 }
@@ -114,29 +108,20 @@ func generateGitRepositorySpec(tb *enbuildv1alpha1.Application, log logr.Logger,
 	}, nil
 }
 
-// func CreateGitRepository(ctx context.Context, r client.Client, application *enbuildv1alpha1.Application, log logr.Logger) error {
-// 	foundApplication := &enbuildv1alpha1.Application{}
-// 	// justCreated := false
-// 	if err := r.Get(ctx, types.NamespacedName{Name: application.Name, Namespace: application.Namespace}, foundApplication); err != nil {
-// 		if apierrs.IsNotFound(err) {
-// 			log.Info("Creating Application", "namespace", application.Namespace, "name", application.Name)
-// 			if err := r.Create(ctx, application); err != nil {
-// 				log.Error(err, "unable to create application")
-// 				return err
-// 			}
-// 			// justCreated = true
-// 		} else {
-// 			log.Error(err, "error getting application")
-// 			return err
-// 		}
-// 	}
-// 	// if !justCreated && CopyApplicationSetFields(application, foundApplication) {
-// 	// 	log.Info("Updating Application", "namespace", application.Namespace, "name", application.Name)
-// 	// 	if err := r.Update(ctx, foundApplication); err != nil {
-// 	// 		log.Error(err, "unable to update application")
-// 	// 		return err
-// 	// 	}
-// 	// }
+func CreateGitRepository(ctx context.Context, r *ApplicationReconciler, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
+	foundGitRepository := &sourcev1.GitRepository{}
+	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
+		if apierrs.IsNotFound(err) {
+			log.Info("Creating GitRepository", "namespace", gitrepository.Namespace, "name", gitrepository.Name)
+			if err := r.Create(ctx, gitrepository); err != nil {
+				log.Error(err, "unable to create gitrepository")
+				return err
+			}
+		} else {
+			log.Error(err, "error getting gitrepository")
+			return err
+		}
+	}
 
-// 	return nil
-// }
+	return nil
+}
