@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	"github.com/fluxcd/pkg/apis/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -27,8 +28,9 @@ import (
 type MicroServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Owner    string `json:"owner,omitempty"`
-	Template string `json:"template"`
+	Owner     string                     `json:"owner,omitempty"`
+	Template  string                     `json:"template"`
+	SecretRef *meta.LocalObjectReference `json:"secretRef,omitempty"`
 }
 
 // MicroServiceStatus defines the observed state of MicroService

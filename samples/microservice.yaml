@@ -5,3 +5,5 @@ metadata:
 spec:
   owner: juned
   template: webapp_react
+  secretRef:
+    name: repository-credentials

@@ -61,6 +61,16 @@ spec:
                 description: 'INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
                   Important: Run "make" to regenerate code after modifying this file'
                 type: string
+              secretRef:
+                description: LocalObjectReference contains enough information to locate
+                  the referenced Kubernetes resource object.
+                properties:
+                  name:
+                    description: Name of the referent.
+                    type: string
+                required:
+                - name
+                type: object
               template:
                 type: string
             required:
