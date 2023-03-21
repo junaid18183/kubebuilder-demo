@@ -72,7 +72,7 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	// logger.Info("got application", "Owner", application.Spec.Owner)
 
 	// Reconcile k8s gitrepository.
-	ReconcileGitRepository(ctx, r, application, logger)
+	ReconcileGitRepositoryApplication(ctx, r, application, logger)
 
 	return ctrl.Result{}, nil
 }
@@ -89,7 +89,7 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ReconcileGitRepository(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
+func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
 	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, "https://gitlab.com/enbuild-staging/iac-templates/bigbang", application.Spec.SecretRef.Name, "main")
 
 	if err != nil {

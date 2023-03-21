@@ -70,7 +70,7 @@ func (r *MicroServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// logger.Info("got microservice", "Owner", microservice.Spec.Owner)
 
 	// Reconcile k8s gitrepository.
-	ReconcileGitRepository1(ctx, r, microservice, logger)
+	ReconcileGitRepositoryMicroService(ctx, r, microservice, logger)
 
 	return ctrl.Result{}, nil
 }
@@ -87,7 +87,7 @@ func (r *MicroServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ReconcileGitRepository1(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
+func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
 	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, "https://gitlab.com/enbuild-staging/iac-templates/bigbang", microservice.Spec.SecretRef.Name, "main")
 
 	if err != nil {
