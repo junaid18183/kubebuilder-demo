@@ -83,3 +83,14 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - source.toolkit.fluxcd.io
+  resources:
+  - GitRepository
+  verbs:
+  - create
+  - get
+  - list
+  - patch
+  - update
+  - watch

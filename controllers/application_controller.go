@@ -20,10 +20,8 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
-	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
@@ -43,6 +41,8 @@ type ApplicationReconciler struct {
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications,verbs=get;list;watch;create;update;patch;delete
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications/status,verbs=get;update;patch
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications/finalizers,verbs=update
+
+// +kubebuilder:rbac:groups=source.toolkit.fluxcd.io,resources=GitRepository,verbs=list;watch;get;patch;create;update
 
 // Reconcile is part of the main kubernetes reconciliation loop which aims to
 // move the current state of the cluster closer to the desired state.
@@ -69,7 +69,7 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	logger.Info("got application", "Owner", application.Spec.Owner)
 
 	// Reconcile k8s gitrepository.
-	gitrepository, err := generateGitRepository(application, logger, r)
+	gitrepository, err := generateGitRepositorySpec(application, logger, r)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
@@ -78,9 +78,16 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 		return ctrl.Result{}, err
 	}
-	// if err := GitRepository(ctx, r, application, logger); err != nil {
+	// if err := CreateGitRepository(ctx, r, application, logger); err != nil {
 	// 	return ctrl.Result{}, err
 	// }
+
+	applyOpts := []client.CreateOption{}
+
+	err = r.Create(ctx, gitrepository, applyOpts...)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 
 	// TODO(user): your logic here
 
@@ -95,7 +102,7 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func generateGitRepository(tb *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*sourcev1.GitRepository, error) {
+func generateGitRepositorySpec(tb *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*sourcev1.GitRepository, error) {
 	return &sourcev1.GitRepository{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      tb.Name,
@@ -107,29 +114,29 @@ func generateGitRepository(tb *enbuildv1alpha1.Application, log logr.Logger, r *
 	}, nil
 }
 
-func GitRepository(ctx context.Context, r client.Client, application *enbuildv1alpha1.Application, log logr.Logger) error {
-	foundApplication := &enbuildv1alpha1.Application{}
-	// justCreated := false
-	if err := r.Get(ctx, types.NamespacedName{Name: application.Name, Namespace: application.Namespace}, foundApplication); err != nil {
-		if apierrs.IsNotFound(err) {
-			log.Info("Creating Application", "namespace", application.Namespace, "name", application.Name)
-			if err := r.Create(ctx, application); err != nil {
-				log.Error(err, "unable to create application")
-				return err
-			}
-			// justCreated = true
-		} else {
-			log.Error(err, "error getting application")
-			return err
-		}
-	}
-	// if !justCreated && CopyApplicationSetFields(application, foundApplication) {
-	// 	log.Info("Updating Application", "namespace", application.Namespace, "name", application.Name)
-	// 	if err := r.Update(ctx, foundApplication); err != nil {
-	// 		log.Error(err, "unable to update application")
-	// 		return err
-	// 	}
-	// }
+// func CreateGitRepository(ctx context.Context, r client.Client, application *enbuildv1alpha1.Application, log logr.Logger) error {
+// 	foundApplication := &enbuildv1alpha1.Application{}
+// 	// justCreated := false
+// 	if err := r.Get(ctx, types.NamespacedName{Name: application.Name, Namespace: application.Namespace}, foundApplication); err != nil {
+// 		if apierrs.IsNotFound(err) {
+// 			log.Info("Creating Application", "namespace", application.Namespace, "name", application.Name)
+// 			if err := r.Create(ctx, application); err != nil {
+// 				log.Error(err, "unable to create application")
+// 				return err
+// 			}
+// 			// justCreated = true
+// 		} else {
+// 			log.Error(err, "error getting application")
+// 			return err
+// 		}
+// 	}
+// 	// if !justCreated && CopyApplicationSetFields(application, foundApplication) {
+// 	// 	log.Info("Updating Application", "namespace", application.Namespace, "name", application.Name)
+// 	// 	if err := r.Update(ctx, foundApplication); err != nil {
+// 	// 		log.Error(err, "unable to update application")
+// 	// 		return err
+// 	// 	}
+// 	// }
 
-	return nil
-}
+// 	return nil
+// }
