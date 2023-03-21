@@ -68,12 +68,13 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 
 	logger.Info("got application", "Owner", application.Spec.Owner)
 
-	// Reconcile k8s application.
-	application, err := generateGitRepository(application, logger, r)
+	// Reconcile k8s gitrepository.
+	gitrepository, err := generateGitRepository(application, logger, r)
 	if err != nil {
 		return ctrl.Result{}, err
 	}
-	if err := ctrl.SetControllerReference(application, application, r.Scheme); err != nil {
+	logger.Info(gitrepository.Spec.URL)
+	if err := ctrl.SetControllerReference(application, gitrepository, r.Scheme); err != nil {
 
 		return ctrl.Result{}, err
 	}
@@ -94,13 +95,15 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		Complete(r)
 }
 
-func generateGitRepository(tb *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*enbuildv1alpha1.Application, error) {
-	return &enbuildv1alpha1.Application{
+func generateGitRepository(tb *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*sourcev1.GitRepository, error) {
+	return &sourcev1.GitRepository{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      tb.Name,
 			Namespace: tb.Namespace,
 		},
-		Spec: enbuildv1alpha1.ApplicationSpec{},
+		Spec: sourcev1.GitRepositorySpec{
+			URL: "https://gitlab.com/enbuild-staging/iac-templates/bigbang",
+		},
 	}, nil
 }
 
