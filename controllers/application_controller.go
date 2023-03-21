@@ -21,7 +21,6 @@ import (
 
 	"github.com/go-logr/logr"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -91,22 +90,6 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-func generateGitRepositorySpec(app *enbuildv1alpha1.Application, log logr.Logger, r *ApplicationReconciler) (*sourcev1.GitRepository, error) {
-
-	return &sourcev1.GitRepository{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      app.Name,
-			Namespace: app.Namespace,
-		},
-		Spec: sourcev1.GitRepositorySpec{
-			URL:       "https://gitlab.com/enbuild-staging/iac-templates/bigbang",
-			SecretRef: app.Spec.SecretRef,
-			Reference: &sourcev1.GitRepositoryRef{Branch: "main"},
-		},
-	}, nil
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 func CreateGitRepository(ctx context.Context, r *ApplicationReconciler, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
 	foundGitRepository := &sourcev1.GitRepository{}
 	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
@@ -128,7 +111,7 @@ func CreateGitRepository(ctx context.Context, r *ApplicationReconciler, gitrepos
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func ReconcileGitRepository(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec(application, logger, r)
+	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, "https://gitlab.com/enbuild-staging/iac-templates/bigbang", application.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err

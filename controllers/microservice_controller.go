@@ -22,7 +22,6 @@ import (
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
 	"github.com/go-logr/logr"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -89,22 +88,6 @@ func (r *MicroServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-func generateGitRepositorySpec1(svc *enbuildv1alpha1.MicroService, log logr.Logger, r *MicroServiceReconciler) (*sourcev1.GitRepository, error) {
-
-	return &sourcev1.GitRepository{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      svc.Name,
-			Namespace: svc.Namespace,
-		},
-		Spec: sourcev1.GitRepositorySpec{
-			URL:       "https://gitlab.com/enbuild-staging/iac-templates/bigbang",
-			SecretRef: svc.Spec.SecretRef,
-			Reference: &sourcev1.GitRepositoryRef{Branch: "main"},
-		},
-	}, nil
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 func CreateGitRepository1(ctx context.Context, r *MicroServiceReconciler, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
 	foundGitRepository := &sourcev1.GitRepository{}
 	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
@@ -125,14 +108,14 @@ func CreateGitRepository1(ctx context.Context, r *MicroServiceReconciler, gitrep
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ReconcileGitRepository1(ctx context.Context, r *MicroServiceReconciler, MicroService *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec1(MicroService, logger, r)
+func ReconcileGitRepository1(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
+	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, "https://gitlab.com/enbuild-staging/iac-templates/bigbang", microservice.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err
 	}
 
-	if err := ctrl.SetControllerReference(MicroService, gitrepository, r.Scheme); err != nil {
+	if err := ctrl.SetControllerReference(microservice, gitrepository, r.Scheme); err != nil {
 
 		return ctrl.Result{}, err
 	}
@@ -140,9 +123,9 @@ func ReconcileGitRepository1(ctx context.Context, r *MicroServiceReconciler, Mic
 		return ctrl.Result{}, err
 	}
 
-	MicroService.Status.Repository = gitrepository.Spec.URL
+	microservice.Status.Repository = gitrepository.Spec.URL
 
-	_err := r.Status().Update(ctx, MicroService)
+	_err := r.Status().Update(ctx, microservice)
 	if _err != nil {
 		return ctrl.Result{}, _err
 	}
