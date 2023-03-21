@@ -19,6 +19,7 @@ package controllers
 import (
 	"context"
 
+	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -31,6 +32,7 @@ import (
 type ApplicationReconciler struct {
 	client.Client
 	Scheme *runtime.Scheme
+	Log    logr.Logger
 }
 
 //+kubebuilder:rbac:groups=enbuild.vivsoft.io,resources=applications,verbs=get;list;watch;create;update;patch;delete
@@ -47,7 +49,17 @@ type ApplicationReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.14.1/pkg/reconcile
 func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
+
 	_ = log.FromContext(ctx)
+
+	application := &enbuildv1alpha1.Application{}
+	if err := r.Get(ctx, req.NamespacedName, application); err != nil {
+		if client.IgnoreNotFound(err) != nil {
+			r.Log.Error(err, "failed to get Cluster resource", "application", req.NamespacedName)
+			return ctrl.Result{}, err
+		}
+		return ctrl.Result{}, nil
+	}
 
 	// TODO(user): your logic here
 
