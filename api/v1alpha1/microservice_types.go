@@ -61,9 +61,7 @@ type MicroServiceStatus struct {
 // +kubebuilder:printcolumn:name=age,type=date,JSONPath=.metadata.creationTimestamp
 // +kubebuilder:printcolumn:name=owner,type=string,JSONPath=.spec.owner
 // +kubebuilder:printcolumn:name=repository,type=string,JSONPath=.status.repository
-// +kubebuilder:printcolumn:name=registry,type=string,JSONPath=.status.registry
-// +kubebuilder:printcolumn:name=pipeline,type=string,JSONPath=.status.pipeline
-// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].status",description=""
+// +kubebuilder:printcolumn:name="Ready",type="string",JSONPath=".status.conditions.status"
 // +kubebuilder:printcolumn:name="Status",type="string",JSONPath=".status.conditions[?(@.type==\"Ready\")].message",description=""
 type MicroService struct {
 	metav1.TypeMeta   `json:",inline"`

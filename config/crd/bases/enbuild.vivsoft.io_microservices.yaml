@@ -25,13 +25,7 @@ spec:
     - jsonPath: .status.repository
       name: repository
       type: string
-    - jsonPath: .status.registry
-      name: registry
-      type: string
-    - jsonPath: .status.pipeline
-      name: pipeline
-      type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+    - jsonPath: .status.conditions.status
       name: Ready
       type: string
     - jsonPath: .status.conditions[?(@.type=="Ready")].message
