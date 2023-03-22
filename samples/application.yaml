@@ -3,15 +3,20 @@ kind: Application
 metadata:
   name: hhs
 spec:
-  owner: juned
+  owner: vivsoftorg2
   infrastrcture: eks_for_hhs
   logs: logs_url
   traces: traces_url
   dashbord: dashboard_url
   microservices:
    - name: hhs-frontend
-     template: webapp-react
+    template: 
+      owner: vivsoftorg
+      repository: iac-templates-app-ci
+      include_all_branches: false
    - name: hhs-backend
-     template: nodejs
+      template: 
+        owner: vivsoftorg
+        repository: nodejs-sampleapp
   secretRef:
     name: repository-credentials
