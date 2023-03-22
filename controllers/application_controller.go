@@ -126,20 +126,23 @@ func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconc
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func ReconcileMicroServiceApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
-	microservice, err := generateMicroServiceSpec(application.Spec.MicroServices[0].Name, application.Namespace, application.Spec.MicroServices[0].Spec.Template, application.Spec.SecretRef.Name, application.Spec.Owner)
 
-	if err != nil {
-		return ctrl.Result{}, err
+	for i := range application.Spec.MicroServices {
+		microservice, err := generateMicroServiceSpec(application.Spec.MicroServices[i].Name, application.Namespace, application.Spec.MicroServices[i].Spec.Template, application.Spec.SecretRef.Name, application.Spec.Owner)
+
+		if err != nil {
+			return ctrl.Result{}, err
+		}
+
+		if err := ctrl.SetControllerReference(application, microservice, r.Scheme); err != nil {
+
+			return ctrl.Result{}, err
+		}
+		if err := CreateMicroService(ctx, r.Client, microservice, logger); err != nil {
+			return ctrl.Result{}, err
+		}
+
 	}
-
-	if err := ctrl.SetControllerReference(application, microservice, r.Scheme); err != nil {
-
-		return ctrl.Result{}, err
-	}
-	if err := CreateMicroService(ctx, r.Client, microservice, logger); err != nil {
-		return ctrl.Result{}, err
-	}
-
 	return ctrl.Result{}, nil
 }
 
