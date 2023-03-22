@@ -70,13 +70,19 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
-	logger.Info("got application", "Owner", application.Spec.MicroServices[0])
+	logger.Info("got application", "Owner", application.Spec.Owner)
 
-	// // Reconcile k8s gitrepository for application which holds the infra code
-	// ReconcileGitRepositoryApplication(ctx, r, application, logger)
+	// Reconcile k8s gitrepository for application which holds the infra code
+	ReconcileGitRepositoryApplication(ctx, r, application, logger)
 
-	// // Reconcile microservices for application
-	// ReconcileMicroServiceApplication(ctx, r, application, logger)
+	// Reconcile microservices for application
+	ReconcileMicroServiceApplication(ctx, r, application, logger)
+
+	// if err := r.reconcileMicroService(request, instance); err != nil {
+	// 	log.Info("Creating MicroService error", err)
+	// 	return reconcile.Result{}, err
+	// }
+
 	return ctrl.Result{}, nil
 }
 
@@ -120,7 +126,7 @@ func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconc
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 func ReconcileMicroServiceApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
-	microservice, err := generateMicroServiceSpec(application.Spec.MicroServices[0].Template, application.Namespace, application.Spec.MicroServices[0].Template, application.Spec.SecretRef.Name, application.Spec.Owner)
+	microservice, err := generateMicroServiceSpec(application.Spec.MicroServices[0].Name, application.Namespace, application.Spec.MicroServices[0].Spec.Template, application.Spec.SecretRef.Name, application.Spec.Owner)
 
 	if err != nil {
 		return ctrl.Result{}, err

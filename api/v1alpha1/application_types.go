@@ -23,6 +23,13 @@ import (
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+type MicroServiceTemplate struct {
+	Name string           `json:"name"`
+	Spec MicroServiceSpec `json:"spec,omitempty"`
+}
+
+// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
+// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
 // ApplicationSpec defines the desired state of Application
 type ApplicationSpec struct {
@@ -40,8 +47,8 @@ type ApplicationSpec struct {
 	// traces of the Application.
 	Traces string `json:"traces,omitempty"`
 	// Dashboard of the Application.
-	Dashboard     string             `json:"dashboard,omitempty"`
-	MicroServices []MicroServiceSpec `json:"microservices"`
+	Dashboard     string                 `json:"dashboard,omitempty"`
+	MicroServices []MicroServiceTemplate `json:"microservices"`
 	// SecretRef specifies the Secret containing authentication credentials for
 	// the GitRepository.
 	// For HTTPS repositories the Secret must contain 'username' and 'password'
