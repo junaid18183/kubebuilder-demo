@@ -70,7 +70,8 @@ func (r *MicroServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// logger.Info("got microservice", "Owner", microservice.Spec.Owner)
 
 	// Reconcile k8s gitrepository.
-	ReconcileGitRepositoryMicroService(ctx, r, microservice, logger)
+	gitrepo := "https://github.com/" + microservice.Spec.Owner + "/" + microservice.Name + ".git"
+	ReconcileGitRepositoryMicroService(ctx, r, microservice, gitrepo, logger)
 
 	return ctrl.Result{}, nil
 }
@@ -87,8 +88,8 @@ func (r *MicroServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, "https://gitlab.com/enbuild-staging/microservice_"+microservice.Name, microservice.Spec.SecretRef.Name, "main")
+func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, gitrepo string, logger logr.Logger) (ctrl.Result, error) {
+	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, gitrepo, microservice.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err

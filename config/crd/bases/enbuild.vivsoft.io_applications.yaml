@@ -96,6 +96,15 @@ spec:
                           - name
                           type: object
                         template:
+                          properties:
+                            include_all_branches:
+                              type: boolean
+                            owner:
+                              type: string
+                            repository:
+                              type: string
+                          type: object
+                        visibility:
                           type: string
                       required:
                       - template

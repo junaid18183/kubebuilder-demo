@@ -67,7 +67,7 @@ func CreateGitRepository(ctx context.Context, r client.Client, gitrepository *so
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func generateMicroServiceSpec(name string, namespace string, template string, secret_ref string, owner string) (*enbuildv1alpha1.MicroService, error) {
+func generateMicroServiceSpec(name string, namespace string, template enbuildv1alpha1.TemplateSpec, secret_ref string, owner string) (*enbuildv1alpha1.MicroService, error) {
 
 	return &enbuildv1alpha1.MicroService{
 		ObjectMeta: metav1.ObjectMeta{

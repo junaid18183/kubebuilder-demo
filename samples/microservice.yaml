@@ -3,7 +3,11 @@ kind: MicroService
 metadata:
   name: hhs-frontend
 spec:
-  owner: juned
-  template: webapp_react
+  owner: vivsoftorg2
+  visibility: public
+  template: 
+    owner: vivsoftorg
+    repository: iac-templates-app-ci
+    include_all_branches: false
   secretRef:
     name: repository-credentials

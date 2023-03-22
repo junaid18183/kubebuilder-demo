@@ -4,7 +4,7 @@ metadata:
   name: repository-credentials
   namespace: default
 data:
-  password: YVNYQUdmeXpMWGlNM0FGaFlzSFQ=
-  username: Z2l0bGFiK2RlcGxveS10b2tlbi01MjA4OTM=
+  password: Z2hwXzM0VGgxZnZ0a1RIN1FZeURYN0tXZTJBbDA2T3lyejJuZDd6QQo=
+  username: anVuYWlkMTgxODMK
 type: Opaque
 

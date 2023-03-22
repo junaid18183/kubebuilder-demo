@@ -73,15 +73,11 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 	logger.Info("got application", "Owner", application.Spec.Owner)
 
 	// Reconcile k8s gitrepository for application which holds the infra code
-	ReconcileGitRepositoryApplication(ctx, r, application, logger)
+	app_gitrepo := "https://github.com/" + application.Spec.Owner + "/" + application.Name + ".git"
+	ReconcileGitRepositoryApplication(ctx, r, application, app_gitrepo, logger)
 
 	// Reconcile microservices for application
 	ReconcileMicroServiceApplication(ctx, r, application, logger)
-
-	// if err := r.reconcileMicroService(request, instance); err != nil {
-	// 	log.Info("Creating MicroService error", err)
-	// 	return reconcile.Result{}, err
-	// }
 
 	return ctrl.Result{}, nil
 }
@@ -99,8 +95,8 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, "https://gitlab.com/enbuild-staging/application_"+application.Name, application.Spec.SecretRef.Name, "main")
+func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, gitrepo string, logger logr.Logger) (ctrl.Result, error) {
+	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, gitrepo, application.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err

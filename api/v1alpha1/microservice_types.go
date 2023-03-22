@@ -24,13 +24,20 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
+type TemplateSpec struct {
+	IncludeAllBranches bool   `json:"include_all_branches,omitempty"`
+	Owner              string `json:"owner,omitempty"`
+	Repository         string `json:"repository,omitempty"`
+}
+
 // MicroServiceSpec defines the desired state of MicroService
 type MicroServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
-	Owner     string                     `json:"owner,omitempty"`
-	Template  string                     `json:"template"`
-	SecretRef *meta.LocalObjectReference `json:"secretRef,omitempty"`
+	Owner      string                     `json:"owner,omitempty"`
+	Template   TemplateSpec               `json:"template"`
+	SecretRef  *meta.LocalObjectReference `json:"secretRef,omitempty"`
+	Visibility string                     `json:"visibility,omitempty"`
 }
 
 // MicroServiceStatus defines the observed state of MicroService
