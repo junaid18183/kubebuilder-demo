@@ -70,13 +70,13 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
-	// logger.Info("got application", "Owner", application.Spec.Owner)
+	logger.Info("got application", "Owner", application.Spec.MicroServices[0])
 
-	// Reconcile k8s gitrepository for application which holds the infra code
-	ReconcileGitRepositoryApplication(ctx, r, application, logger)
+	// // Reconcile k8s gitrepository for application which holds the infra code
+	// ReconcileGitRepositoryApplication(ctx, r, application, logger)
 
-	// Reconcile microservices for application
-	ReconcileMicroServiceApplication(ctx, r, application, logger)
+	// // Reconcile microservices for application
+	// ReconcileMicroServiceApplication(ctx, r, application, logger)
 	return ctrl.Result{}, nil
 }
 
