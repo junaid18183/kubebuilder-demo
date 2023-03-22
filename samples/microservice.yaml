@@ -7,7 +7,7 @@ spec:
   visibility: public
   template: 
     owner: vivsoftorg
-    repository: iac-templates-app-ci
+    repository: sw_template_react
     include_all_branches: false
   secretRef:
     name: repository-credentials

@@ -10,13 +10,12 @@ spec:
   dashbord: dashboard_url
   microservices:
    - name: hhs-frontend
-    template: 
-      owner: vivsoftorg
-      repository: iac-templates-app-ci
-      include_all_branches: false
-   - name: hhs-backend
-      template: 
+     template: 
         owner: vivsoftorg
-        repository: nodejs-sampleapp
+        repository: sw_template_react
+   - name: hhs-backend
+     template: 
+        owner: vivsoftorg
+        repository: sw_template_nodejs
   secretRef:
     name: repository-credentials

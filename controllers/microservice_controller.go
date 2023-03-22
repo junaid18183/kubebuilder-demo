@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"os"
 
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
 	"github.com/go-logr/logr"
@@ -70,8 +71,7 @@ func (r *MicroServiceReconciler) Reconcile(ctx context.Context, req ctrl.Request
 	// logger.Info("got microservice", "Owner", microservice.Spec.Owner)
 
 	// Reconcile k8s gitrepository.
-	gitrepo := "https://github.com/" + microservice.Spec.Owner + "/" + microservice.Name + ".git"
-	ReconcileGitRepositoryMicroService(ctx, r, microservice, gitrepo, logger)
+	ReconcileGitRepositoryMicroService(ctx, r, microservice, logger)
 
 	return ctrl.Result{}, nil
 }
@@ -88,8 +88,11 @@ func (r *MicroServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 //---------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, gitrepo string, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, gitrepo, microservice.Spec.SecretRef.Name, "main")
+func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
+
+	repo := CreateGitRepository(ctx, microservice.Name, os.Getenv("GH_TOKEN"), "private", microservice.Spec.Owner, microservice.Spec.Template.Owner, microservice.Spec.Template.Repository, logger)
+
+	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, repo.GetHTMLURL(), microservice.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err
@@ -99,7 +102,7 @@ func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReco
 
 		return ctrl.Result{}, err
 	}
-	if err := CreateGitRepository(ctx, r.Client, gitrepository, logger); err != nil {
+	if err := CreateGitRepositoryCR(ctx, r.Client, gitrepository, logger); err != nil {
 		return ctrl.Result{}, err
 	}
 

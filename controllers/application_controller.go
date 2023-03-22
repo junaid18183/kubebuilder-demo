@@ -106,7 +106,7 @@ func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconc
 
 		return ctrl.Result{}, err
 	}
-	if err := CreateGitRepository(ctx, r.Client, gitrepository, logger); err != nil {
+	if err := CreateGitRepositoryCR(ctx, r.Client, gitrepository, logger); err != nil {
 		return ctrl.Result{}, err
 	}
 

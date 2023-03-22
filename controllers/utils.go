@@ -21,6 +21,9 @@ import (
 
 	enbuildv1alpha1 "vivsoftorg/enbuild/api/v1alpha1"
 
+	"github.com/google/go-github/v50/github"
+	"golang.org/x/oauth2"
+
 	"github.com/fluxcd/pkg/apis/meta"
 	sourcev1 "github.com/fluxcd/source-controller/api/v1beta2"
 	"github.com/go-logr/logr"
@@ -47,7 +50,7 @@ func generateGitRepositorySpec(name string, namespace string, url string, secret
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-func CreateGitRepository(ctx context.Context, r client.Client, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
+func CreateGitRepositoryCR(ctx context.Context, r client.Client, gitrepository *sourcev1.GitRepository, log logr.Logger) error {
 	foundGitRepository := &sourcev1.GitRepository{}
 	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
 		if apierrs.IsNotFound(err) {
@@ -99,6 +102,30 @@ func CreateMicroService(ctx context.Context, r client.Client, microservice *enbu
 	}
 
 	return nil
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+func CreateGitRepository(ctx context.Context, name string, secret_ref string, visibility string, owner string, templateOwner string, templateRepo string, log logr.Logger) *github.Repository {
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: secret_ref},
+	)
+
+	tc := oauth2.NewClient(ctx, ts)
+	client := github.NewClient(tc)
+	private := false
+
+	templateRepoReq := &github.TemplateRepoRequest{
+		Name:               &name,
+		IncludeAllBranches: &private,
+		Owner:              &owner,
+		Private:            &private,
+	}
+	repo, _, err := client.Repositories.CreateFromTemplate(ctx, templateOwner, templateRepo, templateRepoReq)
+	if err != nil {
+		log.Error(err, "unable to create Repository in Github")
+		return nil
+	}
+	return repo
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
