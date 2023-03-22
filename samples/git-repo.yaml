@@ -6,7 +6,7 @@ metadata:
   namespace: default
 spec:
   interval: 1m0s
-  url: https://gitlab.com/enbuild-staging/iac-templates/bigbang
+  url: https://github.com/VivSoftOrg2/juned_bb_10_feb_2023_gh.git
   ref:
     branch: main
   secretRef:

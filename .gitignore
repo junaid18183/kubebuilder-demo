@@ -28,3 +28,4 @@ Dockerfile.cross
 # 
 Notes.md
 .envrc
+samples/repo-creds.yaml
