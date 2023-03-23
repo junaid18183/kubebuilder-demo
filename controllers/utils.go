@@ -54,9 +54,9 @@ func CreateGitRepositoryCR(ctx context.Context, r client.Client, gitrepository *
 	foundGitRepository := &sourcev1.GitRepository{}
 	if err := r.Get(ctx, types.NamespacedName{Name: gitrepository.Name, Namespace: gitrepository.Namespace}, foundGitRepository); err != nil {
 		if apierrs.IsNotFound(err) {
-			log.Info("Creating GitRepository", "namespace", gitrepository.Namespace, "name", gitrepository.Name)
+			log.Info("Creating GitRepositoryCR", "namespace", gitrepository.Namespace, "name", gitrepository.Name)
 			if err := r.Create(ctx, gitrepository); err != nil {
-				log.Error(err, "unable to create gitrepository")
+				log.Error(err, "unable to create gitrepository CR")
 				return err
 			}
 		} else {
@@ -105,27 +105,44 @@ func CreateMicroService(ctx context.Context, r client.Client, microservice *enbu
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
-func CreateGitRepository(ctx context.Context, name string, secret_ref string, visibility string, owner string, templateOwner string, templateRepo string, log logr.Logger) *github.Repository {
+func CreateGitRepository(ctx context.Context, name string, secret_ref string, private bool, owner string, templete bool, templateOwner string, templateRepo string, log logr.Logger) *github.Repository {
+
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: secret_ref},
 	)
 
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
-	private := false
 
-	templateRepoReq := &github.TemplateRepoRequest{
-		Name:               &name,
-		IncludeAllBranches: &private,
-		Owner:              &owner,
-		Private:            &private,
+	if templete {
+		templateRepoReq := &github.TemplateRepoRequest{
+			Name:    &name,
+			Owner:   &owner,
+			Private: &private,
+		}
+		repo, _, err := client.Repositories.CreateFromTemplate(ctx, templateOwner, templateRepo, templateRepoReq)
+		if err != nil {
+			log.Error(err, "unable to create Repository in Github")
+			return nil
+		}
+		return repo
+
+	} else {
+		autoInit := true
+		repoReq := &github.Repository{
+			Owner:    &github.User{Name: &owner},
+			Name:     &name,
+			AutoInit: &autoInit,
+			Private:  &private,
+		}
+		repo, _, err := client.Repositories.Create(ctx, owner, repoReq)
+		if err != nil {
+			log.Error(err, "unable to create Repository in Github")
+			return nil
+		}
+		return repo
 	}
-	repo, _, err := client.Repositories.CreateFromTemplate(ctx, templateOwner, templateRepo, templateRepoReq)
-	if err != nil {
-		log.Error(err, "unable to create Repository in Github")
-		return nil
-	}
-	return repo
+
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------

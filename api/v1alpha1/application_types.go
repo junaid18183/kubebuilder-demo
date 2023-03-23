@@ -48,7 +48,7 @@ type ApplicationSpec struct {
 	Traces string `json:"traces,omitempty"`
 	// Dashboard of the Application.
 	Dashboard     string                 `json:"dashboard,omitempty"`
-	MicroServices []MicroServiceTemplate `json:"microservices"`
+	MicroServices []MicroServiceTemplate `json:"microservices,omitempty"`
 	// SecretRef specifies the Secret containing authentication credentials for
 	// the GitRepository.
 	// For HTTPS repositories the Secret must contain 'username' and 'password'

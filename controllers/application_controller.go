@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"os"
 
 	"github.com/go-logr/logr"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -70,11 +71,11 @@ func (r *ApplicationReconciler) Reconcile(ctx context.Context, req ctrl.Request)
 		return ctrl.Result{}, nil
 	}
 
-	logger.Info("got application", "Owner", application.Spec.Owner)
+	// logger.Info("got application", "Owner", application.Spec.Owner)
 
 	// Reconcile k8s gitrepository for application which holds the infra code
-	app_gitrepo := "https://github.com/" + application.Spec.Owner + "/" + application.Name + ".git"
-	ReconcileGitRepositoryApplication(ctx, r, application, app_gitrepo, logger)
+	// app_gitrepo := "https://github.com/" + application.Spec.Owner + "/" + application.Name + ".git"
+	ReconcileGitRepositoryApplication(ctx, r, application, logger)
 
 	// Reconcile microservices for application
 	ReconcileMicroServiceApplication(ctx, r, application, logger)
@@ -95,8 +96,9 @@ func (r *ApplicationReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, gitrepo string, logger logr.Logger) (ctrl.Result, error) {
-	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, gitrepo, application.Spec.SecretRef.Name, "main")
+func ReconcileGitRepositoryApplication(ctx context.Context, r *ApplicationReconciler, application *enbuildv1alpha1.Application, logger logr.Logger) (ctrl.Result, error) {
+	repo := CreateGitRepository(ctx, "application_"+application.Name, os.Getenv("GH_TOKEN"), true, application.Spec.Owner, false, "", "", logger)
+	gitrepository, err := generateGitRepositorySpec(application.Name, application.Namespace, repo.GetHTMLURL(), application.Spec.SecretRef.Name, "main")
 
 	if err != nil {
 		return ctrl.Result{}, err

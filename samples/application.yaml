@@ -13,9 +13,9 @@ spec:
      template: 
         owner: vivsoftorg
         repository: sw_template_react
-   - name: hhs-backend
-     template: 
-        owner: vivsoftorg
-        repository: sw_template_nodejs
+  #  - name: hhs-backend
+  #    template: 
+  #       owner: vivsoftorg
+  #       repository: sw_template_nodejs
   secretRef:
     name: repository-credentials

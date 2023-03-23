@@ -132,7 +132,6 @@ spec:
                 description: traces of the Application.
                 type: string
             required:
-            - microservices
             - owner
             type: object
           status:

@@ -90,7 +90,7 @@ func (r *MicroServiceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 
 func ReconcileGitRepositoryMicroService(ctx context.Context, r *MicroServiceReconciler, microservice *enbuildv1alpha1.MicroService, logger logr.Logger) (ctrl.Result, error) {
 
-	repo := CreateGitRepository(ctx, microservice.Name, os.Getenv("GH_TOKEN"), "private", microservice.Spec.Owner, microservice.Spec.Template.Owner, microservice.Spec.Template.Repository, logger)
+	repo := CreateGitRepository(ctx, microservice.Name, os.Getenv("GH_TOKEN"), true, microservice.Spec.Owner, true, microservice.Spec.Template.Owner, microservice.Spec.Template.Repository, logger)
 
 	gitrepository, err := generateGitRepositorySpec(microservice.Name, microservice.Namespace, repo.GetHTMLURL(), microservice.Spec.SecretRef.Name, "main")
 
